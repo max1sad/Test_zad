@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Файловый менеджер</title>
+        <!-- для взаимодействия с API -->
+        <script src="axios.min.js"></script>
+        <link rel="shortcut icon" href="#" />
+        <style>
+            .cl-1{
+                position: relative;
+                display: inline-block;
+                height: 25px;
+                cursor: pointer;
+            }
+            .cl-1 img {
+                margin-right: 7px;
+            }
+            .cl-1 span {
+                position: absolute;
+                top: 50%;
+                transform: translate(0, -50%);
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <h1>Файловый менеджер</h1>
+            <button onclick="getListOfFiles(0)" style="padding-left: 10px; padding-right: 10px;">/..</button>
+            <div id="file-visible" onclick="getListOfFiles(2);" style="margin-top: 10px;">
+                <!--<label class="cl-1"><img src="icon_dir.png" width="25" height="25" /><span>File</span></label><br>
+                <a href="#" class="cl-1" type-item="catalog" path="ssss"><img src="icon_dir.png" width="25" height="25" /><span>File</span></a>-->
+            </div>
+        </div>
+    </body>
+    <script> 
+        path_start = '/home';
+        function getData(name_command, params){
+            axios
+                    .post('script.php/'+name_command,params)
+                    .then(response => {
+                        if (response.data != 'not_obj'){
+                            document.getElementById('file-visible').innerHTML = response.data;
+                        }
+                    });
+        };
+        function getListOfFiles(operation){
+            let obj;
+            if (operation == 0){
+                var p = path_start.split('/');
+                var len_p = p.length;
+                if (len_p > 2){
+                    path_start = "/" + p.slice(1, len_p - 1).join('/');
+                }else{
+                    path_start = '/home';
+                }
+                obj = {"operation": "data", "path": path_start, "tyle-item": "catalog"};
+            }
+            if (operation == 1){
+                obj = {"operation": "new"};
+            }
+            if (operation == 2){
+                var elem = event.target.parentNode;
+                if (event.target.tagName == 'IMG' || event.target.tagName == 'SPAN'){
+                    var type_it = elem.getAttribute('type-item');
+                    if (type_it == 'catalog'){
+                        path_start = elem.getAttribute('path');
+                        obj = {"operation": "data", "path": elem.getAttribute('path'), "tyle-item": type_it};
+                    } 
+                }
+            }
+            if (obj != undefined){
+                getData('list_obj', obj);
+            }
+        };
+        getListOfFiles(1);
+    </script>
+</html>

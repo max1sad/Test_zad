@@ -1,0 +1,4 @@
+-- fetch 
+SELECT count(motorbike.name) as count_moto, type_motorbike.name FROM motorbike inner join type_motorbike on motorbike.id_type = type_motorbike.id
+where motorbike.discontinued = 0
+group by type_motorbike.name;
